@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling Castle Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        #gameCanvas {
+            border: 2px solid #333;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        #gameControls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #meatCount {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        #unitSelection {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .unitButton {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #333;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.1s;
+            background-size: cover;
+            color: black;
+            text-shadow: 1px 1px 2px grey;
+            font-size: 12px;
+            text-align: center;
+        }
+        .unitButton:hover {
+            transform: scale(1.05);
+        }
+        .unitButton.selected {
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <h1> </h1>
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <div id="gameControls">
+        <button id="createUnitBtn">Create Unit</button>
+        <button id="getMeatBtn">Get Meat</button>
+    </div>
+    <div id="meatCount">Meat: 0</div>
+    <div id="unitSelection">
+        <!-- Unit buttons will be added here dynamically -->
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
