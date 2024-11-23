@@ -216,14 +216,19 @@ class Game {
         this.overallScore = 0;
         this.difficulty = 0.01; // Start with the initial difficulty
 
-        this.unitTypes = [
-            new Unit(0, 0, 'Basic',  1,    1, 40, 1, 1, 'Donkey Kong'),
-            new Unit(0, 0, 'Tank',   2,  0.5, 60, 4, 2, 'Bowser'),
-            new Unit(0, 0, 'Scout',  1,  2.5, 40, 1, 2, 'Sonic'),
-            new Unit(0, 0, 'Sammie', 0.5, .2, 90, 2, 2, 'Sammie-Man'),
-            new Unit(0, 0, 'Steve',  3,    1, 30, 4, 3, 'Steve')
-        ];
-        this.selectedUnitIndex = 0;
+     // Store all possible unit types
+    this.allUnitTypes = [
+        new Unit(0, 0, 'Basic',  1,    1, 40, 1, 1, 'Donkey Kong'),
+        new Unit(0, 0, 'Scout',  1,  2.5, 40, 1, 2, 'Sonic'),
+        new Unit(0, 0, 'Sammie', 0.5, .2, 90, 2, 2, 'Sammie-Man'),
+        new Unit(0, 0, 'Steve',  3,    1, 30, 4, 3, 'Steve'),
+        new Unit(0, 0, 'Tank',   2,  0.5, 60, 4, 2, 'Bowser')
+    ];
+
+    // Start with only basic unit
+    this.unitTypes = [this.allUnitTypes[0]];
+
+       this.selectedUnitIndex = 0;
         this.createUnitButtons();
         this.isPaused = false;
         this.currentWord = '';
@@ -235,6 +240,33 @@ class Game {
 
     }
 
+updateAvailableUnits() {
+    this.unitTypes = [];
+    // Basic unit always available
+    this.unitTypes.push(this.allUnitTypes[0]);
+    
+    if (this.level >= 2) {
+        this.unitTypes.push(this.allUnitTypes[1]); // Scout
+    }
+    if (this.level >= 3) {
+        this.unitTypes.push(this.allUnitTypes[2]); // Sammie
+    }
+    if (this.level >= 4) {
+        this.unitTypes.push(this.allUnitTypes[3]); // Steve
+    }
+    if (this.level >= 5) {
+        this.unitTypes.push(this.allUnitTypes[4]); // Tank
+    }
+
+    // Reset selected unit to Basic when updating units
+    this.selectedUnitIndex = 0;
+    
+    // Clear and recreate unit buttons
+    while (unitSelection.firstChild) {
+        unitSelection.removeChild(unitSelection.firstChild);
+    }
+    this.createUnitButtons();
+}
 
     startSpellingQuiz() {
     if (Date.now() < this.meatCooldown) {
@@ -427,16 +459,29 @@ resetWordTracking() {
         
         // Increase difficulty and level
         this.level++;
-        this.difficulty += 0.01; // Increase difficulty by 0.01 each level
+        this.difficulty += 0.01;
+        
+        // Update available units before starting next level
+        this.updateAvailableUnits();
         
         // Prepare for next level
         this.resetGame();
-        alert(message + "Preparing for next level...");
+        
+        // Add unit unlock message if applicable
+        if (this.level === 2) {
+            message += "\nUnlocked new unit: Sonic!";
+        } else if (this.level === 3) {
+            message += "\nUnlocked new unit: Sammie!";
+        } else if (this.level === 4) {
+            message += "\nUnlocked new unit: Steve!";
+        } else if (this.level === 5) {
+            message += "\nUnlocked new unit: Bowser!";
+        }
+        
+        alert(message + "\nPreparing for next level...");
     } else {
         levelScore = -1 * this.computer.castle.health;
         message = `Game Over! You lost on level ${this.level}.\nFinal Overall Score: ${this.overallScore}\n`;
-        
-        // End the game
         alert(message);
         this.endGame();
     }
@@ -459,6 +504,7 @@ endGame() {
     this.difficulty = 0.02;
     this.resetGame();
 this.resetWordTracking();
+this.updateAvailableUnits(); // Reset available units to just Basic
 }
 
     draw() {
