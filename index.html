@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spelling Castle Game</title>
+    <link rel="icon" href="favicon.ico">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,6 +14,19 @@
             background-color: #f0f0f0;
             margin: 0;
             padding: 20px;
+        }
+        .screen {
+            display: none;
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .screen.active {
+            display: block;
         }
         #gameCanvas {
             border: 2px solid #333;
@@ -47,6 +61,10 @@
             display: flex;
             gap: 10px;
         }
+        #leaderboard {
+        max-height: 400px;
+        overflow-y: auto;/
+}
         .unitButton {
             width: 60px;
             height: 60px;
@@ -71,19 +89,61 @@
             border-color: #4CAF50;
             box-shadow: 0 0 5px #4CAF50;
         }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
-    <h1> </h1>
-    <canvas id="gameCanvas" width="800" height="400"></canvas>
-    <div id="gameControls">
-        <button id="createUnitBtn">Create Unit</button>
-        <button id="getMeatBtn">Get Meat</button>
+    <h1>Spelling Castle</h1>
+
+    <!-- Name input section -->
+    <div id="name-input-screen" class="screen active">
+        <label for="player-name">Enter Your Name:</label><br>
+        <input type="text" id="player-input-name" placeholder="Your Name">
+        <button onclick="startGame()">Start Game</button>
     </div>
-    <div id="meatCount">Meat: 0</div>
-    <div id="unitSelection">
-        <!-- Unit buttons will be added here dynamically -->
+
+    <!-- Level selection section -->
+    <div id="level-selection-screen" class="screen">
+        <h2>Select a Level</h2>
+        <button onclick="selectLevel(1)">Level 1</button>
+        <button onclick="selectLevel(2)">Level 2</button>
+        <button onclick="selectLevel(3)">Level 3</button>
+        <button onclick="selectLevel(4)">Level 4</button>
+        <button onclick="selectLevel(5)">Level 5</button>
     </div>
-    <script src="game.js"></script>
+
+    <!-- Game screen -->
+    <div id="game-screen" class="screen">
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        <div id="gameControls">
+            <button id="createUnitBtn">Create Unit</button>
+            <button id="getMeatBtn">Get Meat</button>
+        </div>
+        <div id="meatCount">Meat: 0</div>
+        <div id="unitSelection">
+            <!-- Unit buttons will be added here dynamically -->
+        </div>
+    </div>
+
+    <!-- Leaderboard screen -->
+    <div id="leaderboard-screen" class="screen">
+        <h2>Leaderboard for Level <span id="current-level"></span></h2>
+        <div id="leaderboard"></div>
+        <button onclick="showScreen('level-selection-screen')">Back to Level Selection</button>
+    </div>
+
+    <script src="game.js" type="module"></script>
 </body>
 </html>

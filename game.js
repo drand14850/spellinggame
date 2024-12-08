@@ -1,30 +1,62 @@
+// Initialize Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCnGHMQhiYTMNZfnAa94NqM5vTaqhOd3Yc",
+  authDomain: "spelling-castle-test.firebaseapp.com",
+  projectId: "spelling-castle-test",
+  storageBucket: "spelling-castle-test.appspot.com",
+  messagingSenderId: "754771190060",
+  appId: "1:754771190060:web:43e162ea2526dc59cb4c89"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const auth = getAuth(app);
+signInAnonymously(auth)
+    .then(() => {
+        console.log("User signed in anonymously");
+    })
+    .catch((error) => {
+        console.error("Error during authentication: ", error);
+    });
+
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const createUnitBtn = document.getElementById('createUnitBtn');
 const getMeatBtn = document.getElementById('getMeatBtn');
 const meatCountDiv = document.getElementById('meatCount');
 const unitSelection = document.getElementById('unitSelection');
-const wordList = [
-            "hay", "tray", "claim", "pain", "stay", 
-            "speed", "mean", "bleed", "deep", "beat", 
-            "pie", "lie", "tried", "thief", "chief",
-            "basket", "traffic", "contest", "picnic", "rabbit", "robot", "tiger", "never", "recess", 
-	    "begin", "canteen", "delay", "goalie", "neatly", "repeat", "jumble", "pimple", "maple", "handle", "table", "contract", "dolphin", "pilgrim", "complain", "hundred", 
-            "city", "cent", "circus", "price", "place", "gem", "ginger", "giant", "cage", "magic", 
-            "edge", "fudge", "badge", "bridge", "dodge", "mommy","miles","isaac","cat","miles","dog",
-            "weekly", "quickly", "firmly", "lovely", "mostly",
-            "also", "around", "each", "want", "going", "another", "talk", "three", "work", "threw almost", "because", "does", "even", "square", 
-            "away", "different", "help", "why", "twenty", "again", "number", "old", "saw", "how", "found", "important", "start", "women", "sugar", 
-            "before", "between", "every", "pretty", "sweet", "along", "favorite", "next", "while", "parent", 
-            "could", "should", "usually", "would", "bottom", "father", "mother", "under", "stuff", "forget", "last", "left", "through", "fight", "huge", "enough", "few", "probably", "until", "leader", 
-            "foot", "food", "room", "took", "tooth", "coin", "voice", "point", "toy", "enjoy", "round", "house", "flower", "town", "loud", "draw", "taught", "lawn", "author", "caught", "suit", "clue", "juice", "blew", "drew", 
-            "retell", "remove", "unable", "unfair", "unwrap", "spells", "boxes", "wishes", "buses", "trucks", "teacher", "softer", "ruler", "faster", "painter", "dark", 
-            "darker", "darkest", "smaller", "smallest", "wanted", "acted", "sailed", "filled", "walked", "tricked", "cries", "crying", "puppies", "happier", "played", "sitting", "sleeping", "runner", "stopped", "biggest",
-            "both", "something", "thought", "person", "lesson", "always", "large", "those", "kind", "cool", "asked", "often", "together", "whole", "month", "children", "form", "terrible", 
-            "wonderful", "half", "beautiful", "though", "without", "care", "able", "fast", "door", "five", "books", "above", "behind", "new", "paper", "whether", "same", "across", "things", "gone", "plain", "year", 
-            "anything", "close", "store", "team", "become", "maybe", "watch", "river", "queen", "change", "outside", "wrong", "second", "insect", "each", "ahead", "wrote", "part", "excited",
-            "word","birds","lion","grandma","shark","orange","color"
-];
+const wordLists = {
+    1: [
+        "hay", "tray", "claim", "pain", "stay", 
+        "speed", "mean", "bleed", "deep", "beat", 
+        "pie", "lie", "tried", "thief", "chief",
+        "basket", "traffic", "contest", "picnic", "rabbit", "robot", "tiger", "never", "recess", 
+        "begin", "canteen", "delay", "goalie", "neatly", "repeat", "jumble", "pimple", "maple", "handle", "table", "contract", "dolphin", "pilgrim", "complain", "hundred", 
+        "city", "cent", "circus", "price", "place", "gem", "ginger", "giant", "cage", "magic", 
+        "edge", "fudge", "badge", "bridge", "dodge", "mommy", "miles", "isaac", "cat", "dog",
+        "weekly", "quickly", "firmly", "lovely", "mostly",
+        "also", "around", "each", "want", "going", "another", "talk", "three", "work", "threw almost", "because", "does", "even", "square", 
+        "away", "different", "help", "why", "twenty", "again", "number", "old", "saw", "how", "found", "important", "start", "women", "sugar", 
+        "before", "between", "every", "pretty", "sweet", "along", "favorite", "next", "while", "parent", 
+        "could", "should", "usually", "would", "bottom", "father", "mother", "under", "stuff", "forget", "last", "left", "through", "fight", "huge", "enough", "few", "probably", "until", "leader", 
+        "foot", "food", "room", "took", "tooth", "coin", "voice", "point", "toy", "enjoy", "round", "house", "flower", "town", "loud", "draw", "taught", "lawn", "author", "caught", "suit", "clue", "juice", "blew", "drew", 
+        "retell", "remove", "unable", "unfair", "unwrap", "spells", "boxes", "wishes", "buses", "trucks", "teacher", "softer", "ruler", "faster", "painter", "dark", 
+        "darker", "darkest", "smaller", "smallest", "wanted", "acted", "sailed", "filled", "walked", "tricked", "cries", "crying", "puppies", "happier", "played", "sitting", "sleeping", "runner", "stopped", "biggest",
+        "both", "something", "thought", "person", "lesson", "always", "large", "those", "kind", "cool", "asked", "often", "together", "whole", "month", "children", "form", "terrible", 
+        "wonderful", "half", "beautiful", "though", "without", "care", "able", "fast", "door", "five", "books", "above", "behind", "new", "paper", "whether", "same", "across", "things", "gone", "plain", "year", 
+        "anything", "close", "store", "team", "become", "maybe", "watch", "river", "queen", "change", "outside", "wrong", "second", "insect", "each", "ahead", "wrote", "part", "excited",
+        "word", "birds", "lion", "grandma", "shark", "orange", "color"
+    ],
+    2: ["speed", "mean", "bleed", "deep", "beat"],
+    3: ["pie", "lie", "tried", "thief", "chief"],
+    4: ["basket", "traffic", "contest", "picnic", "rabbit"],
+    5: ["city", "cent", "circus", "price", "place"]
+};
 
 
 // Preload images
@@ -35,6 +67,87 @@ const images = {
     'Steve': { idle: null, attack: null },
     'Sammie': { idle: null, attack: null },
 };
+
+// Function to save game record
+async function saveGameRecord(name, level, score) {
+    const user = auth.currentUser;
+    if (!user) {
+        console.error("User is not authenticated");
+        return;
+    }
+    try {
+        await addDoc(collection(db, "game_records"), {
+            name: name,
+            level: level,
+            score: score,
+            userId: user.uid
+        });
+    } catch (e) {
+        console.error("Error adding document: ", e);
+    }
+}
+  
+  // Function to fetch top 10 records
+  async function fetchTopRecords() {
+    try {
+        const q = query(collection(db, "game_records"), orderBy("score", "desc"), limit(10));
+        const querySnapshot = await getDocs(q);
+
+        const records = [];
+        querySnapshot.forEach((doc) => {
+            records.push(doc.data());
+        });
+        console.log("Loaded records:", records);
+        return records;
+    } catch (e) {
+        console.error("Error fetching leaderboard: ", e);
+        return [];
+    }
+}
+  
+  // Screen management
+  function showScreen(screenId) {
+    const screens = document.querySelectorAll('.screen');
+    screens.forEach(screen => {
+      screen.style.display = 'none';
+    });
+    document.getElementById(screenId).style.display = 'block';
+  }
+  
+  // Game logic
+  let playerName = "";
+  let currentLevel = 1;
+  
+  function startGame() {
+    playerName = document.getElementById('player-input-name').value;
+    if (playerName.trim() === "") {
+      alert("Please enter your name.");
+      return;
+    }
+    showScreen('level-selection-screen');
+  }
+
+  function selectLevel(level) {
+    currentLevel = level;
+    showScreen('game-screen');
+    initGame();
+  }
+
+  function showLeaderboardScreen() {
+    fetchTopRecords().then(records => {
+        const leaderboardDiv = document.getElementById('leaderboard');
+        leaderboardDiv.innerHTML = "";
+        if (records.length === 0) {
+            leaderboardDiv.innerHTML = "<p>No records found!</p>";
+        } else {
+            records.forEach((record, index) => {
+                leaderboardDiv.innerHTML += `<p>${index + 1}. ${record.name}: ${record.score} (Level ${record.level})</p>`;
+            });
+        }
+        document.getElementById('current-level').textContent = currentLevel;
+        showScreen('leaderboard-screen');
+    });
+}
 
 function loadImage(src) {
     return new Promise((resolve, reject) => {
@@ -211,10 +324,10 @@ class Game {
     constructor() {
         this.player = new Player(new Castle(50, canvas.height - 150, '#8B4513', 100, true));
         this.computer = new Player(new Castle(canvas.width - 130, canvas.height - 150, '#4682B4', 100, false), false);
-	
-	this.level = 1;
-        this.overallScore = 0;
-        this.difficulty = 0.01; // Start with the initial difficulty
+
+    this.level = currentLevel;
+    this.difficulty = 0.01 + (this.level - 1) * 0.01;
+    this.levelScore = 0;
 
      // Store all possible unit types
     this.allUnitTypes = [
@@ -228,15 +341,16 @@ class Game {
     // Start with only basic unit
     this.unitTypes = [this.allUnitTypes[0]];
 
-       this.selectedUnitIndex = 0;
-        this.createUnitButtons();
-        this.isPaused = false;
-        this.currentWord = '';
+    this.selectedUnitIndex = 0;
+    this.createUnitButtons();
+    this.isPaused = false;
+    this.updateAvailableUnits();
+    this.currentWord = '';
 	this.meatCooldown = 0;
-       this.correctWords = new Set();
-        this.incorrectWords = [];
-        this.wordQueue = [];
-        this.wordListCopy = [...wordList]; // Create a copy of the word list
+    this.correctWords = new Set();
+    this.incorrectWords = [];
+    this.wordQueue = [];
+    this.wordListCopy = [...(wordLists[currentLevel] || [])];
 
     }
 
@@ -368,14 +482,14 @@ resetWordTracking() {
     this.correctWords.clear();
     this.incorrectWords = [];
     this.wordQueue = [];
-    this.wordListCopy = [...wordList];
+    this.wordListCopy = [...(wordLists[currentLevel] || [])];
 }
 
     createUnitButtons() {
         this.unitTypes.forEach((unit, index) => {
             const button = document.createElement('div');
             button.className = 'unitButton';
-            button.style.backgroundImage = `url('path/to/${unit.name.toLowerCase()}_idle.gif')`;
+            button.style.backgroundImage = `url('images/${unit.type.toLowerCase()}_idle.gif')`;
             button.style.backgroundSize = 'cover';
             button.innerHTML = `${unit.name}<br>Cost: ${unit.cost}`;
             button.addEventListener('click', () => this.selectUnit(index));
@@ -398,7 +512,7 @@ resetWordTracking() {
 
     update() {
 
-	if (this.isPaused) return;
+    if (this.isPaused || this.gameOverState) return;
         
 	// Move units
         this.player.units.forEach(unit => unit.move(this.computer.castle));
@@ -449,22 +563,17 @@ resetWordTracking() {
     }
 
  async gameOver() {
+    if (this.gameOverState) return;
+
+    this.gameOverState = true;
     let levelScore;
     let message;
 
     if (this.player.castle.health > 0) {
         levelScore = this.player.castle.health;
-        this.overallScore += levelScore;
-        message = `Congratulations! You won level ${this.level}!\nLevel Score: ${levelScore}\nOverall Score: ${this.overallScore}\n`;
-        
-        // Increase difficulty and level
-        this.level++;
-        this.difficulty += 0.01;
-        
-        // Update available units before starting next level
-        this.updateAvailableUnits();
-        
-        // Prepare for next level
+        message = `Congratulations! You won level ${this.level}!\nLevel Score: ${levelScore}\n`;
+        console.log("Saving record:", playerName, this.level, levelScore);
+        await saveGameRecord(playerName, this.level, levelScore);
         this.resetGame();
         
         // Add unit unlock message if applicable
@@ -478,33 +587,39 @@ resetWordTracking() {
             message += "\nUnlocked new unit: Bowser!";
         }
         
-        alert(message + "\nPreparing for next level...");
-    } else {
-        levelScore = -1 * this.computer.castle.health;
-        message = `Game Over! You lost on level ${this.level}.\nFinal Overall Score: ${this.overallScore}\n`;
         alert(message);
         this.endGame();
+        showLeaderboardScreen();
+    } else {
+        levelScore = -1 * this.computer.castle.health;
+        message = `Game Over! You lost on level ${this.level}.\n`;
+        alert(message);
+        this.endGame();
+        showScreen('level-selection-screen');
     }
 }
 
 resetGame() {
+    this.levelScore = 0;
     this.player.castle.health = this.player.castle.maxHealth;
     this.computer.castle.health = this.computer.castle.maxHealth;
     this.player.units = [];
     this.computer.units = [];
     this.player.meat = 0;
     updateMeatCount(this.player.meat);
- this.resetWordTracking();
+    this.resetWordTracking();
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    if (scoreDisplay) {
+        scoreDisplay.remove();
+    }
+
 }
 
 endGame() {
-    // Reset everything to initial state
-    this.level = 1;
-    this.overallScore = 0;
-    this.difficulty = 0.02;
     this.resetGame();
-this.resetWordTracking();
-this.updateAvailableUnits(); // Reset available units to just Basic
+    this.resetWordTracking();
+    this.updateAvailableUnits(); // Reset available units to just Basic
+    this.gameOverState = false;
 }
 
     draw() {
@@ -550,18 +665,26 @@ async function initGame() {
     document.body.appendChild(scoreDisplay);
 
     function updateScoreDisplay() {
-        scoreDisplay.textContent = `Level: ${game.level} | Overall Score: ${game.overallScore}`;
+        scoreDisplay.textContent = `Level: ${game.level} | Score: ${game.levelScore}`;
     }
 
-    // Update score display in the game loop
-    function extendedGameLoop() {
+// Update score display in the game loop
+function extendedGameLoop() {
+    const gameScreen = document.getElementById('game-screen');
+    
+    if (gameScreen && gameScreen.style.display === 'block') {
         game.update();
         game.draw();
         updateScoreDisplay();
-        requestAnimationFrame(extendedGameLoop);
     }
-
-    extendedGameLoop();
+    
+    requestAnimationFrame(extendedGameLoop);
 }
 
-initGame();
+extendedGameLoop();
+}
+
+window.showScreen = showScreen;
+window.startGame = startGame;
+window.selectLevel = selectLevel;
+window.showLeaderboardScreen = showLeaderboardScreen;
