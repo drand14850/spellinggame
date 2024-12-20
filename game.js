@@ -4,12 +4,12 @@ import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs } from
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCnGHMQhiYTMNZfnAa94NqM5vTaqhOd3Yc",
-  authDomain: "spelling-castle-test.firebaseapp.com",
-  projectId: "spelling-castle-test",
-  storageBucket: "spelling-castle-test.appspot.com",
-  messagingSenderId: "754771190060",
-  appId: "1:754771190060:web:43e162ea2526dc59cb4c89"
+  apiKey: "AIzaSyCfOO-6AANEZO4n6VyLnEqcX37qzGr5KWY",
+  authDomain: "spelling-castle.firebaseapp.com",
+  projectId: "spelling-castle",
+  storageBucket: "spelling-castle.firebasestorage.app",
+  messagingSenderId: "395173269387",
+  appId: "1:395173269387:web:31b2d6c248fcb8fe9d298e"
 };
 
 const app = initializeApp(firebaseConfig);
